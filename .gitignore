@@ -1,0 +1,5 @@
+﻿backend/.env
+backend/*.db
+backend/body.json
+__pycache__/
+*.pyc

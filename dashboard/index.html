@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lead Desk — Dubai Real Estate</title>
+<style>
+  :root{
+    --sand: #f6f3ec;
+    --ink: #1c2320;
+    --ink-soft: #5b645f;
+    --teal: #0e4a4f;
+    --teal-soft: #dbe9e8;
+    --gold: #b98a3e;
+    --line: #e4ddce;
+    --card: #ffffff;
+    --new: #6b7280;
+    --contacted: #0e4a4f;
+    --follow_up: #b98a3e;
+    --qualified: #1f7a5c;
+    --escalated: #b3411f;
+    --closed_won: #1f7a5c;
+    --closed_lost: #9a938a;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--sand);
+    color:var(--ink);
+    font-family: 'Iowan Old Style','Georgia','Times New Roman',serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:40px 28px 80px;}
+
+  header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    border-bottom:1px solid var(--line);
+    padding-bottom:24px;
+    margin-bottom:32px;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+  .brand-eyebrow{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:32px;
+    margin:0;
+    font-weight:500;
+    letter-spacing:-0.01em;
+  }
+  .subtitle{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color:var(--ink-soft);
+    font-size:14px;
+    margin-top:6px;
+  }
+  .stat-row{
+    display:flex;
+    gap:28px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .stat{text-align:right;}
+  .stat-num{font-size:26px; font-weight:700; color:var(--teal); line-height:1;}
+  .stat-label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); margin-top:4px;}
+
+  .toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  .filter-pills{display:flex; gap:8px; flex-wrap:wrap;}
+  .pill{
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink-soft);
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:12.5px;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .pill:hover{border-color:var(--teal);}
+  .pill.active{background:var(--teal); color:#fff; border-color:var(--teal);}
+  .refresh-btn{
+    border:none;
+    background:none;
+    color:var(--ink-soft);
+    font-size:12.5px;
+    cursor:pointer;
+    font-family:inherit;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .refresh-btn:hover{color:var(--teal);}
+
+  table{width:100%; border-collapse:collapse;}
+  thead th{
+    text-align:left;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    font-weight:600;
+    padding:0 16px 10px;
+    border-bottom:1px solid var(--line);
+  }
+  tbody tr{
+    background:var(--card);
+    cursor:pointer;
+    transition:background .12s ease;
+  }
+  tbody tr:hover{background:var(--teal-soft);}
+  tbody td{
+    padding:16px;
+    border-bottom:1px solid var(--line);
+    font-size:15px;
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  .lead-name{font-weight:600;}
+  .lead-sub{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+  .badge{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:11px;
+    font-weight:600;
+    padding:4px 10px;
+    border-radius:999px;
+    display:inline-block;
+    text-transform:capitalize;
+    white-space:nowrap;
+  }
+  .badge.new{background:#eceff1; color:var(--new);}
+  .badge.contacted{background:var(--teal-soft); color:var(--teal);}
+  .badge.follow_up{background:#f6ead2; color:var(--gold);}
+  .badge.qualified{background:#dcefe5; color:var(--qualified);}
+  .badge.escalated{background:#f9ddd2; color:var(--escalated);}
+  .badge.closed_won{background:#dcefe5; color:var(--closed_won);}
+  .badge.closed_lost{background:#eeece8; color:var(--closed_lost);}
+
+  .empty, .loading, .error{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-soft);
+    background:var(--card);
+    border-radius:var(--radius);
+  }
+  .error{color:var(--escalated);}
+
+  /* Detail panel */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(28,35,32,0.35);
+    display:none;
+    align-items:flex-start;
+    justify-content:flex-end;
+    z-index:20;
+  }
+  .overlay.open{display:flex;}
+  .panel{
+    background:var(--sand);
+    width:420px;
+    max-width:92vw;
+    height:100%;
+    overflow-y:auto;
+    padding:32px 28px;
+    box-shadow:-8px 0 24px rgba(0,0,0,.08);
+  }
+  .panel-close{
+    float:right;
+    border:none;
+    background:none;
+    font-size:22px;
+    cursor:pointer;
+    color:var(--ink-soft);
+    line-height:1;
+  }
+  .panel h2{font-size:24px; margin:0 0 4px; font-weight:500;}
+  .panel-meta{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:20px;
+  }
+  .info-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:13px;
+    margin-bottom:28px;
+    border-top:1px solid var(--line);
+    padding-top:20px;
+  }
+  .info-item .lbl{color:var(--ink-soft); font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:3px;}
+  .info-item .val{font-weight:600;}
+
+  .timeline-title{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  .timeline-item{
+    position:relative;
+    padding-left:20px;
+    padding-bottom:20px;
+    border-left:2px solid var(--line);
+    margin-left:5px;
+  }
+  .timeline-item:last-child{border-left-color:transparent; padding-bottom:0;}
+  .timeline-item::before{
+    content:'';
+    position:absolute;
+    left:-6px; top:2px;
+    width:10px; height:10px;
+    border-radius:50%;
+    background:var(--teal);
+  }
+  .timeline-desc{font-size:14px; margin-bottom:2px;}
+  .timeline-time{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size:11.5px;
+    color:var(--ink-soft);
+  }
+
+  @media (max-width:640px){
+    .stat-row{gap:16px;}
+    header{flex-direction:column; align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand-eyebrow">Dubai Real Estate</div>
+      <h1>Lead Desk</h1>
+      <div class="subtitle">Live intake, follow-up, and escalation tracking</div>
+    </div>
+    <div class="stat-row" id="statRow">
+      <div class="stat"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total</div></div>
+      <div class="stat"><div class="stat-num" id="statNew">—</div><div class="stat-label">New</div></div>
+      <div class="stat"><div class="stat-num" id="statEscalated">—</div><div class="stat-label">Escalated</div></div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="filter-pills" id="filterPills">
+      <button class="pill active" data-status="">All</button>
+      <button class="pill" data-status="new">New</button>
+      <button class="pill" data-status="contacted">Contacted</button>
+      <button class="pill" data-status="follow_up">Follow-up</button>
+      <button class="pill" data-status="escalated">Escalated</button>
+      <button class="pill" data-status="closed_won">Closed Won</button>
+    </div>
+    <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+  </div>
+
+  <div id="content">
+    <div class="loading">Loading leads…</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="panel" id="panel"></div>
+</div>
+
+<script>
+  // Point this at your deployed backend.
+  const API_BASE = "https://dubai-lead-automation-production.up.railway.app";
+
+  let allLeads = [];
+  let activeFilter = "";
+
+  const contentEl = document.getElementById("content");
+  const overlay = document.getElementById("overlay");
+  const panel = document.getElementById("panel");
+
+  function fmtDate(iso){
+    if(!iso) return "—";
+    const d = new Date(iso);
+    return d.toLocaleString(undefined, { month:"short", day:"numeric", hour:"2-digit", minute:"2-digit" });
+  }
+
+  function statusLabel(s){
+    return s.replaceAll("_"," ");
+  }
+
+  async function loadLeads(){
+    contentEl.innerHTML = '<div class="loading">Loading leads…</div>';
+    try{
+      const res = await fetch(`${API_BASE}/leads`);
+      if(!res.ok) throw new Error(`Server responded ${res.status}`);
+      allLeads = await res.json();
+      renderStats();
+      renderTable();
+    }catch(err){
+      contentEl.innerHTML = `<div class="error">Could not load leads. ${err.message}<br><br>Check that the backend is running and reachable.</div>`;
+    }
+  }
+
+  function renderStats(){
+    document.getElementById("statTotal").textContent = allLeads.length;
+    document.getElementById("statNew").textContent = allLeads.filter(l=>l.status==="new").length;
+    document.getElementById("statEscalated").textContent = allLeads.filter(l=>l.status==="escalated").length;
+  }
+
+  function renderTable(){
+    const filtered = activeFilter ? allLeads.filter(l=>l.status===activeFilter) : allLeads;
+
+    if(filtered.length === 0){
+      contentEl.innerHTML = '<div class="empty">No leads here yet. New leads will appear as they come in through the intake webhook.</div>';
+      return;
+    }
+
+    const rows = filtered.map(lead => `
+      <tr data-id="${lead.id}">
+        <td>
+          <div class="lead-name">${escapeHtml(lead.name)}</div>
+          <div class="lead-sub">${escapeHtml(lead.property_interest || lead.source)}</div>
+        </td>
+        <td><span class="badge ${lead.status}">${statusLabel(lead.status)}</span></td>
+        <td>${escapeHtml(lead.source)}</td>
+        <td>${fmtDate(lead.last_contacted_at)}</td>
+        <td>${fmtDate(lead.created_at)}</td>
+      </tr>
+    `).join("");
+
+    contentEl.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Status</th>
+            <th>Source</th>
+            <th>Last Contact</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+
+    contentEl.querySelectorAll("tbody tr").forEach(tr=>{
+      tr.addEventListener("click", ()=> openLead(tr.dataset.id));
+    });
+  }
+
+  function escapeHtml(str){
+    if(!str) return "";
+    return str.replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  }
+
+  async function openLead(id){
+    panel.innerHTML = '<div class="loading">Loading…</div>';
+    overlay.classList.add("open");
+    try{
+      const res = await fetch(`${API_BASE}/leads/${id}`);
+      if(!res.ok) throw new Error(`Server responded ${res.status}`);
+      const lead = await res.json();
+      renderPanel(lead);
+    }catch(err){
+      panel.innerHTML = `<button class="panel-close" id="closeBtn">&times;</button><div class="error">Could not load this lead. ${err.message}</div>`;
+      document.getElementById("closeBtn").addEventListener("click", closePanel);
+    }
+  }
+
+  function renderPanel(lead){
+    const activities = lead.activities || [];
+    const timeline = activities.length
+      ? activities.map(a => `
+          <div class="timeline-item">
+            <div class="timeline-desc">${escapeHtml(a.description)}</div>
+            <div class="timeline-time">${fmtDate(a.created_at)}</div>
+          </div>
+        `).join("")
+      : '<div class="lead-sub">No activity logged yet.</div>';
+
+    panel.innerHTML = `
+      <button class="panel-close" id="closeBtn">&times;</button>
+      <h2>${escapeHtml(lead.name)}</h2>
+      <div class="panel-meta">${escapeHtml(lead.email || "No email")} · ${escapeHtml(lead.phone || "No phone")}</div>
+
+      <div class="info-grid">
+        <div class="info-item"><div class="lbl">Status</div><div class="val"><span class="badge ${lead.status}">${statusLabel(lead.status)}</span></div></div>
+        <div class="info-item"><div class="lbl">Source</div><div class="val">${escapeHtml(lead.source)}</div></div>
+        <div class="info-item"><div class="lbl">Interest</div><div class="val">${escapeHtml(lead.property_interest || "—")}</div></div>
+        <div class="info-item"><div class="lbl">Last Contact</div><div class="val">${fmtDate(lead.last_contacted_at)}</div></div>
+      </div>
+
+      <div class="timeline-title">Activity Timeline</div>
+      ${timeline}
+    `;
+    document.getElementById("closeBtn").addEventListener("click", closePanel);
+  }
+
+  function closePanel(){
+    overlay.classList.remove("open");
+  }
+
+  overlay.addEventListener("click", (e)=>{
+    if(e.target === overlay) closePanel();
+  });
+
+  document.getElementById("filterPills").addEventListener("click", (e)=>{
+    if(e.target.classList.contains("pill")){
+      document.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));
+      e.target.classList.add("active");
+      activeFilter = e.target.dataset.status;
+      renderTable();
+    }
+  });
+
+  document.getElementById("refreshBtn").addEventListener("click", loadLeads);
+
+  loadLeads();
+</script>
+
+</body>
+</html>
